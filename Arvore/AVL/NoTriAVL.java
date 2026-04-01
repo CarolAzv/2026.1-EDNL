@@ -1,14 +1,17 @@
-public class NoTri extends Object{
+public class NoTriAVL extends Object{
     private Object elemento;
-    private NoTri pai;
-    private NoTri esquerda;
-    private NoTri direita;
+    private NoTriAVL pai;
+    private NoTriAVL esquerda;
+    private NoTriAVL direita;
+    private int FB;
 
-    public NoTri(Object o){
+    //No para arvore AVL
+    public NoTriAVL(Object o){
         elemento = o;
         pai = null;
         esquerda = null;
         direita = null;
+        FB = 0;
     }
 
   
@@ -21,36 +24,44 @@ public class NoTri extends Object{
     }
 
   
-    public void setEsquerda(NoTri o){
+    public void setEsquerda(NoTriAVL o){
         this.esquerda = o;  
     }
 
-    public NoTri getEsquerda(){
+    public NoTriAVL getEsquerda(){
         if(esquerda==null)
             return null;
         return esquerda;
     }
 
   
-  public void setDireita(NoTri o){
+  public void setDireita(NoTriAVL o){
         this.direita = o;  
     }
 
-    public NoTri getDireita(){
+    public NoTriAVL getDireita(){
         if(direita==null)
             return null;
         return direita;
     }
 
   
-    public void setPai(NoTri o){
+    public void setPai(NoTriAVL o){
         this.pai = o;  
     }
 
-    public NoTri getPai(){
+    public NoTriAVL getPai(){
         if(pai==null)
             return null;
         return pai;
+    }
+
+    public void setFB(int o){
+        this.FB = o;
+    }
+
+    public Object getFB(){
+        return FB;
     }
 
 }

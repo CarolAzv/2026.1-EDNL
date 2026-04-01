@@ -1,24 +1,24 @@
 import java.util.ArrayList;
 import java.util.Iterator;
-public class ArvoreBinaria{
-    NoTri raiz;
+public class ArvoreAVL{
+    NoTriAVL raiz;
     int tamanho;
 
-    public ArvoreBinaria(Object o){
+    public ArvoreAVL(Object o){
         raiz = new NoTri(o);
         tamanho = 1;
     }
 
     //acesso
-    public NoTri root(){
+    public NoTriAVL root(){
         return this.raiz;
     }
     
-    public NoTri parent(NoTri no){
+    public NoTriAVL parent(NoTriAVL no){
         return no.getPai();
     }
 
-    public Iterator<Object> children(NoTri no){
+    public Iterator<Object> children(NoTriAVL no){
         ArrayList<Object> child = new ArrayList<>();
         child.add(no.getEsquerda());
         child.add(no.getDireita());
@@ -33,7 +33,7 @@ public class ArvoreBinaria{
 
     public int altura(){
         ArrayList<Integer> altura = new ArrayList<>();
-        NoTri no = raiz;
+        NoTriAVL no = raiz;
         int deep = 0;
         alturaCheck(no, deep, altura);
         int maior = 0;
@@ -46,7 +46,7 @@ public class ArvoreBinaria{
         return maior;
     }
 
-    public void alturaCheck(NoTri no, int deep, ArrayList<Integer> altura){
+    public void alturaCheck(NoTriAVL no, int deep, ArrayList<Integer> altura){
         if(no.getElemento() == null){
             altura.add(deep);
             return;
@@ -66,12 +66,12 @@ public class ArvoreBinaria{
 
     public Iterator<Object> elementos(){
         ArrayList<Object> elementos = new ArrayList<>();
-        NoTri no = raiz;
+        NoTriAVL no = raiz;
         elementosCheck(no, elementos);
         return elementos.iterator();
     }
 
-    public void elementosCheck(NoTri no, ArrayList<Object> elementos){
+    public void elementosCheck(NoTriAVL no, ArrayList<Object> elementos){
         if(no.getElemento() == null){ //
             return;
         }
@@ -91,28 +91,28 @@ public class ArvoreBinaria{
 
 
     //consulta
-    public boolean isInternal(NoTri no){
+    public boolean isInternal(NoTriAVL no){
         if(no.getEsquerda() == null && no.getDireita() == null){
             return false;
         }
         return true;
     }
     
-    public boolean isExternal(NoTri no){
+    public boolean isExternal(NoTriAVL no){
         if(no.getEsquerda() == null && no.getDireita() == null){
             return true;
         }
         return false;
     }
 
-    public boolean isRoot(NoTri no){
+    public boolean isRoot(NoTriAVL no){
         if(no==raiz){
             return true;
         }
         return false;
     }
 
-    public int depth(NoTri no){
+    public int depth(NoTriAVL no){
         if(no==raiz){
             return 0;
         }
@@ -121,13 +121,13 @@ public class ArvoreBinaria{
 
 
     //addicionar
-    public void replace(NoTri no, int o){
+    public void replace(NoTriAVL no, int o){
         // Implementação futura
     }
 
     public void addChild(int o){
-        NoTri novo = new NoTri(o);
-        NoTri seeing = raiz;
+        NoTriAVL novo = new NoTriAVL(o);
+        NoTriAVL seeing = raiz;
         int foi = 0;
         while(foi!=1){
             if((int)seeing.getElemento()>o){
@@ -158,7 +158,7 @@ public class ArvoreBinaria{
 
     //remover
     public void remove(Object o){
-        NoTri seeing = raiz;
+        NoTriAVL seeing = raiz;
         //loop para achar o nó
         while(raiz.getElemento()!=o){
             if((int)seeing.getElemento()>(int)o){
@@ -206,7 +206,7 @@ public class ArvoreBinaria{
             if((int)seeing.getElemento()>(int)seeing.getPai().getElemento()){ //se o elemento for maior que o pai
                 seeing.getPai().setDireita(seeing.getDireita());
                 if(seeing.getDireita().getEsquerda()!=null && seeing.getDireita().getDireita()!=null){
-                    NoTri au = seeing.getEsquerda();
+                    NoTriAVL au = seeing.getEsquerda();
                     while(seeing.getEsquerda()!=null || seeing.getDireita()!=null){
                         seeing=seeing.getDireita();
                     }
@@ -219,5 +219,10 @@ public class ArvoreBinaria{
             }
             return;
         }
+    }
+
+    //Esquerda Simples
+    public void esquerdaSimples(Object o){
+        
     }
 }
