@@ -6,10 +6,10 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class ArvoreAVLRun{
-private static Arvore arvore;
+private static ArvoreAVL arvore;
 
     public static void main (String[] args){
-        arvore = new Arvore(10);
+        arvore = new ArvoreAVL(10);
         int altura;
         int quantos = 1;
         int tempalt;
@@ -17,7 +17,11 @@ private static Arvore arvore;
 
         //Add
         arvore.addChild(5);
+        imprimirArvore(arvore.root());
+        System.out.println("----------------------------------------");
         arvore.addChild(15);
+        imprimirArvore(arvore.root());
+        System.out.println("----------------------------------------");
         arvore.addChild(2);
         arvore.addChild(8);
         arvore.addChild(22);

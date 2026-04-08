@@ -5,10 +5,10 @@ import java.util.AbstractMap;
 import static java.lang.Math.min;
 import static java.lang.Math.max;
 
-public class Arvore{
+public class ArvoreAVL{
     NoAVL raiz;
 
-    public Arvore(Object o){
+    public ArvoreAVL(Object o){
         raiz = new NoAVL(o);
     }
 
