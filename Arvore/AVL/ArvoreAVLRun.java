@@ -19,23 +19,28 @@ private static ArvoreAVL arvore;
         arvore.addChild(5);
         imprimirArvore(arvore.root());
         System.out.println("----------------------------------------");
+
         arvore.addChild(15);
         imprimirArvore(arvore.root());
         System.out.println("----------------------------------------");
-        arvore.addChild(2);
-        arvore.addChild(8);
-        arvore.addChild(22);
 
+        arvore.addChild(2);
+        imprimirArvore(arvore.root());
+        System.out.println("----------------------------------------");
+
+        arvore.addChild(8);
+        imprimirArvore(arvore.root());
+        System.out.println("----------------------------------------");
+
+        arvore.addChild(22);
         imprimirArvore(arvore.root());
         System.out.println("----------------------------------------");
 
         arvore.addChild(25);
-
         imprimirArvore(arvore.root());
         System.out.println("----------------------------------------");
 
         arvore.removeChild(5);
-
         imprimirArvore(arvore.root());
         System.out.println("----------------------------------------");
     }
