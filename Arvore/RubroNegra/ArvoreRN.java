@@ -5,16 +5,17 @@ import java.util.AbstractMap;
 import static java.lang.Math.min;
 import static java.lang.Math.max;
 
-public class ArvoreAVL{
-    NoAVL raiz;
+public class ArvoreRN{
+    NoRN raiz;
 
-    public ArvoreAVL(Object o){
-        raiz = new NoAVL(o);
+    public ArvoreRN(Object o){
+        raiz = new NoRN(o);
+        raiz.setCor("preto");
     }
 
 
     //Devolve raiz
-    public NoAVL root(){
+    public NoRN root(){
         return this.raiz;
     }
 
@@ -23,7 +24,7 @@ public class ArvoreAVL{
     //------------------------------------------------------------------------------------//
 
     //É raiz?
-    public boolean isRoot(NoAVL no){
+    public boolean isRoot(NoRN no){
         if(no==raiz){
             return true;
         }
@@ -31,7 +32,7 @@ public class ArvoreAVL{
     }
 
     //É folha?
-    public boolean isExternal(NoAVL no){
+    public boolean isExternal(NoRN no){
         if(no.getEsquerda() == null && no.getDireita() == null){
             return true;
         }
@@ -39,115 +40,51 @@ public class ArvoreAVL{
     }
 
     //Não é folha?
-    public boolean isInternal(NoAVL no){
+    public boolean isInternal(NoRN no){
         if(no.getEsquerda() == null && no.getDireita() == null){
             return false;
         }
         return true;
     }
 
-    public NoAVL locate(Object o){
-        NoAVL seeing = raiz;
-        while((int)seeing.getElemento()!=o){ // Checando para ver se o no seeing é o desejado
-            if((int)seeing.getElemento()>o){
+    //É vermelho?
+    public boolean isRed(NoRN no){
+        if(no.getCor().equals("vermelho")){
+            return true;
+        }
+        return false;
+    }
+
+    //É preto?
+    public boolean isBlack(NoRN no){
+        if(no.getCor().equals("preto")){
+            return true;
+        }
+        return false;
+    }
+
+    public NoRN locate(Object o){
+        NoRN seeing = raiz;
+         while((int)seeing.getElemento()!=(int)o){ // Checando para ver se o no seeing é o desejado
+            if((int)seeing.getElemento()>(int)o){
                 seeing=seeing.getEsquerda();
             }
-            else if((int)seeing.getElemento()<o){
+            else if((int)seeing.getElemento()<(int)o){
                 seeing=seeing.getDireita();
             }
         }
+        return seeing;
     }
 
     //-----------------------------------------------------------------------------//
     //----------------------------------|Rotação|----------------------------------//
     //-----------------------------------------------------------------------------//
 
-    //addicionar FB - Começa por um no correto e com o pai não feito
-    public void addingFB(NoAVL no){ 
-        NoAVL primeiro = no;
-        NoAVL pai = no.getPai();
-        NoAVL filho = no;
-        int esquerda = 0;
-        int direita = 0;
-
-        while(pai != null && pai.getPai() != null){
-            if(filho == pai.getEsquerda()){ // Checando se o filho é a esquerda
-                pai.setFB((int)pai.getFB()+1); // Se sim, adiciona 1 no FB do pai
-                if((int)pai.getFB()==0){ // Checando se o pai ficou balanceado
-                    break;
-                }
-                else if((int)pai.getFB()==2){ // Checando se esta desbalanceado para a esquerda
-                    esquerda++;
-                    break;
-                }
-            } else {
-                pai.setFB((int)pai.getFB()-1); // adiciona -1 no FB do pai
-                if((int)pai.getFB()==0){ // Checando se o pai ficou balanceado
-                    break;
-                }
-                else if((int)pai.getFB()==-2){ // Checando se esta desbalanceado para a direita
-                    direita++;
-                    break;
-                }
-            }
-            filho = pai;
-            pai = pai.getPai();
-        }
-        if(esquerda==1){ // Checando se tem que fazer rotação para a esquerda
-            direitaSimples(primeiro.getPai());
-        }
-        else if(direita==1){ // Checando se tem que fazer rotação para a direita
-            esquerdaSimples(primeiro.getPai());
-        }
-        return;
-    }
-
-    //remover FB - Começa de um no arumado e com o pai não feito
-    public void removingFB(NoAVL no){ 
-        NoAVL primeiro = no;
-        NoAVL pai = no.getPai();
-        NoAVL filho = no;
-        int esquerda = 0;
-        int direita = 0;
-
-        while(pai != null && pai.getPai() != null){
-            if(filho == pai.getEsquerda()){ // Checando se o filho é a esquerda
-                pai.setFB((int)pai.getFB()-1); // Se sim, adiciona -1 no FB do pai
-                if((int)pai.getFB()==0){ // Checando se o pai ficou balanceado
-                    break;
-                }
-                else if((int)pai.getFB()==2){ // Checando se esta desbalanceado para a esquerda
-                    esquerda++;
-                    break;
-                }
-            } else {
-                pai.setFB((int)pai.getFB()+1); // adiciona 1 no FB do pai
-                if((int)pai.getFB()==0){ // Checando se o pai ficou balanceado
-                    break;
-                }
-                else if((int)pai.getFB()==-2){ // Checando se esta desbalanceado para a direita
-                    direita++;
-                    break;
-                }
-            }
-            filho = pai;
-            pai = pai.getPai();
-        }
-
-        if(esquerda==1){ // Checando se tem que fazer rotação para a esquerda
-            direitaSimples(primeiro.getPai());
-        }
-        else if(direita==1){ // Checando se tem que fazer rotação para a direita
-            esquerdaSimples(primeiro.getPai());
-        }
-        return;
-    }
-
     //Esquerda Simples - Rotação para esqerda \ para ^
-    public void esquerdaSimples(NoAVL o){
-        NoAVL filho = o.getDireita();
+    public void esquerdaSimples(NoRN o){
+        NoRN filho = o.getDireita();
         if(o.getPai() != null){  //checando sé tem pai para atualizar ele também
-            NoAVL pai = o.getPai();
+            NoRN pai = o.getPai();
             if(pai.getDireita() == o){ //checando pelo filho certo
                 pai.setDireita(filho);
             } else {
@@ -159,17 +96,14 @@ public class ArvoreAVL{
         o.setDireita(filho.getEsquerda());
         filho.setEsquerda(o);
 
-        o.setFB((int)o.getFB() + 1 - min((int)filho.getFB(), 0));
-        filho.setFB((int)filho.getFB() + 1 + max((int)o.getFB(), 0));
-        addingFB(filho);
         return;
     }
 
     //Direita Simples - Rotação para direita / para ^
-    public void direitaSimples(NoAVL o){
-        NoAVL filho = o.getEsquerda();
+    public void direitaSimples(NoRN o){
+        NoRN filho = o.getEsquerda();
         if(o.getPai() != null){ //checando sé tem pai para atualizar ele também
-            NoAVL pai = o.getPai();
+            NoRN pai = o.getPai();
             if(pai.getEsquerda() == o){ //checando pelo filho certo
                 pai.setEsquerda(filho);
             } else {
@@ -181,10 +115,81 @@ public class ArvoreAVL{
         o.setEsquerda(filho.getDireita());
         filho.setDireita(o);
 
-        o.setFB((int)o.getFB() - 1 - min((int)filho.getFB(), 0));
-        filho.setFB((int)filho.getFB() - 1 + max((int)o.getFB(), 0));
-        addingFB(filho);
         return;
+    }
+
+    //-----------------------------------------------------------------------------//
+    //------------------------------------|Cor|------------------------------------//
+    //-----------------------------------------------------------------------------//
+
+    public void mudarCor(NoRN no, String cor){
+        no.setCor(cor);
+    }
+
+    public void checkCor(NoRN no){
+        NoRN filho = no;
+
+        //check se é raiz
+        if(isRoot(no)){
+            mudarCor(no, "preto");
+            return;
+        }
+
+        NoRN pai = no.getPai();
+
+        //caso1 - check se o pai é preto
+        if (pai == null || isBlack(pai)) {
+            return;
+        }
+
+        //pegando o avô
+        NoRN avo = pai.getPai();
+        if (avo == null) return; // pai vermelho sem avô: situação inválida
+
+        //pegando o tio
+        NoRN tio;
+        if(pai.getPai().getEsquerda() == pai){ //checando se o tio é a esquerda ou direita do avô
+            tio = pai.getPai().getDireita();
+        }else{
+            tio = pai.getPai().getEsquerda();
+        }
+
+        //caso 2
+        if (tio != null && isRed(tio)) {
+            mudarCor(pai, "preto");
+            mudarCor(tio, "preto");
+            mudarCor(avo, "vermelho");
+
+            checkCor(avo); // Verificando avô
+            return;
+        }
+
+        //caso 3
+        if (pai == avo.getEsquerda()) {
+            // Pai é filho esquerdo do avô
+            if(filho == pai.getDireita()){
+                esquerdaSimples(pai);
+                filho = pai;
+                pai = filho.getPai();
+            }
+            //caso 3a
+            mudarCor(pai, "preto");
+        mudarCor(avo, "vermelho");
+        direitaSimples(avo);
+
+    } else {
+        //caso 3c
+        if (filho == pai.getEsquerda()) {
+            direitaSimples(pai);
+            filho = pai;
+            pai = filho.getPai();
+        }
+        // Caso 3b: Filho é direita do pai → rotação esquerda no avô
+        mudarCor(pai, "preto");
+        mudarCor(avo, "vermelho");
+        esquerdaSimples(avo);
+    }
+        
     }
 
     //-------------------------------------------------------------------------------//
@@ -192,15 +197,14 @@ public class ArvoreAVL{
     //-------------------------------------------------------------------------------//
 
     public void addChild(int o){
-        NoAVL novo = new NoAVL(o);
-        NoAVL seeing = raiz;
+        NoRN novo = new NoRN(o);
+        NoRN seeing = raiz;
         int foi = 0; // Marcado para confirma que foi colocado
         while(foi!=1){
             if((int)seeing.getElemento()>o){ // Checando se o elemento do no atual é maior que o novo
                 if(seeing.getEsquerda()==null){ //Se sim e o no a esquerda é fazio, coloca o no novo aqui
                     novo.setPai(seeing);
                     seeing.setEsquerda(novo);
-                    seeing.setFB((int)seeing.getFB()+1);
                     foi++;
                 }
                 seeing=seeing.getEsquerda(); // Move o no atual par a esquerda
@@ -209,7 +213,6 @@ public class ArvoreAVL{
                 if(seeing.getDireita()==null){ //Se sim e o no a direita é fazio, coloca o no novo aqui
                     novo.setPai(seeing);
                     seeing.setDireita(novo);
-                    seeing.setFB((int)seeing.getFB()-1);
                     foi++;
                 }
                 seeing=seeing.getDireita();  // Move o no atual par a direita
@@ -219,7 +222,8 @@ public class ArvoreAVL{
                 foi++;
             }
         }
-        addingFB(novo.getPai());
+
+        checkCor(novo);
         return;
     }
 
@@ -228,17 +232,16 @@ public class ArvoreAVL{
     //-----------------------------------------------------------------------------//
 
     public void removeChild(int o){
-        NoAVL seeing = locate(o);
+        NoRN seeing = locate(o);
 
         //caso no não tenha filhos
         if(seeing.getEsquerda()==null && seeing.getDireita()==null){
             if((int)seeing.getElemento() > (int)(seeing.getPai()).getElemento()){ //removendo filho a direita
                 (seeing.getPai()).setDireita(null);
-                removingFB(seeing);
                 seeing.setPai(null);
             }
             (seeing.getPai()).setEsquerda(null); //removendo filho a esquerda
-            removingFB(seeing);
+            checkCor(seeing.getPai());
             seeing.setPai(null);
             return;
         }
@@ -247,13 +250,22 @@ public class ArvoreAVL{
         //caso tenha apenas um filho
         else if(seeing.getEsquerda()!=null && seeing.getDireita()==null){ // Filho a esquerda
             if((int)seeing.getElemento() > (int)(seeing.getPai()).getElemento()){ // Checando se o filho é maior que o pai
-                seeing.getPai().setDireita(seeing.getEsquerda()); // Se sim, passa o filho para a direita do pai
+                if(this.isBlack(seeing) && this.isRed(seeing.getEsquerda())){ //check se o seeing é preto e o filho é vermelho
+                    (seeing.getEsquerda()).setCor("vermelho");
+                    
+                }
+                seeing.getPai().setDireita(seeing.getEsquerda()); // Se filho maior, passa o filho para a direita do pai
+
             } else {
+                if(this.isBlack(seeing) && this.isRed(seeing.getEsquerda())){ //check se o seeing é preto e o filho é vermelho
+                    (seeing.getEsquerda()).setCor("vermelho");
+                    
+                }
                 seeing.getPai().setEsquerda(seeing.getEsquerda()); // Se não, passa o filho para a esquerda do pai
             }
 
+            checkCor(seeing.getPai());
             seeing.setEsquerda(null);
-            removingFB(seeing);
             seeing.setPai(null);
             return;
         }
@@ -265,8 +277,8 @@ public class ArvoreAVL{
                 (seeing.getPai()).setEsquerda(seeing.getDireita()); // Se não, passa o filho para a esquerda do pai
             }
 
+            checkCor(seeing.getPai());
             seeing.setDireita(null);
-            removingFB(seeing);
             seeing.setPai(null);
             return;
         }
@@ -274,7 +286,7 @@ public class ArvoreAVL{
 
         //caso tenha os dois filhos
         else{
-            NoAVL sucesor = seeing.getDireita(); // Achando o sucesor
+            NoRN sucesor = seeing.getDireita(); // Achando o sucesor
             while(sucesor.getEsquerda()!=null){ // Procurando um que não tem filho a esquerda
                 sucesor = sucesor.getEsquerda();
             }
@@ -298,11 +310,10 @@ public class ArvoreAVL{
             }
 
             sucesor.setPai(seeing.getPai()); // Passando o pai do seeing para o sucesor
-            sucesor.setFB((int)seeing.getFB()-1); // Passando o FB do seeing para o sucesor -1
             seeing.setEsquerda(null);
             seeing.setDireita(null);
-            removingFB(seeing);
             seeing.setPai(null);
+            checkCor(sucesor);
             return;
         }
     }
@@ -313,36 +324,36 @@ public class ArvoreAVL{
 
     //Pega todos os nos (PARECE CERTO)
     public Map.Entry<ArrayList<Object>, Integer> elementos(){
-        ArrayList<Object> elementosEfb = new ArrayList<>();
-        NoAVL no = raiz;
+        ArrayList<Object> elementosEcor = new ArrayList<>();
+        NoRN no = raiz;
         int altura = 1;
-        elementosEfb.add(no.getElemento());
-        elementosEfb.add(no.getFB());
-        elementosCheck(no, elementosEfb, altura);
-        return new AbstractMap.SimpleEntry<>(elementosEfb, altura);
+        elementosEcor.add(no.getElemento());
+        elementosEcor.add(no.getCor());
+        elementosCheck(no, elementosEcor, altura);
+        return new AbstractMap.SimpleEntry<>(elementosEcor, altura);
     }
 
-    //DEVERIA pegar os nos e seus FB por linha
-    public void elementosCheck(NoAVL no, ArrayList<Object> elementosEfb, int altura){
+    //DEVERIA pegar os nos e suas cor
+    public void elementosCheck(NoRN no, ArrayList<Object> elementosEcor, int altura){
         if(no == null){
             return;
         }
         //pegando info esquerda
         if(no.getEsquerda() != null){
-            elementosEfb.add((no.getEsquerda()).getElemento());
-            elementosEfb.add(no.getEsquerda().getFB());
+            elementosEcor.add((no.getEsquerda()).getElemento());
+            elementosEcor.add(no.getEsquerda().getCor());
         }
 
         //pegando info direita
         if(no.getDireita() != null){
-            elementosEfb.add((no.getDireita()).getElemento());
-            elementosEfb.add(no.getDireita().getFB());
+            elementosEcor.add((no.getDireita()).getElemento());
+            elementosEcor.add(no.getDireita().getCor());
         }
         altura = altura+1;
 
         //indo pegar os proximos numeros
-        elementosCheck(no.getEsquerda(), elementosEfb, altura);
-        elementosCheck(no.getDireita(), elementosEfb, altura);
+        elementosCheck(no.getEsquerda(), elementosEcor, altura);
+        elementosCheck(no.getDireita(), elementosEcor, altura);
         
         return;
     }
