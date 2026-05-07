@@ -25,10 +25,7 @@ public class ArvoreRN{
 
     //É raiz?
     public boolean isRoot(NoRN no){
-        if(no==raiz){
-            return true;
-        }
-        return false;
+        return no.getPai() == null;
     }
 
     //É folha?
@@ -65,15 +62,15 @@ public class ArvoreRN{
 
     public NoRN locate(Object o){
         NoRN seeing = raiz;
-         while((int)seeing.getElemento()!=(int)o){ // Checando para ver se o no seeing é o desejado
+         while(seeing!=null && (int)seeing.getElemento()!=(int)o){ // Checando para ver se o no seeing é o desejado
             if((int)seeing.getElemento()>(int)o){
                 seeing=seeing.getEsquerda();
             }
-            else if((int)seeing.getElemento()<(int)o){
+            else{
                 seeing=seeing.getDireita();
             }
         }
-        return seeing;
+        return seeing; // retorna null se não encontrado
     }
 
     //-----------------------------------------------------------------------------//
@@ -127,15 +124,15 @@ public class ArvoreRN{
     }
 
     public void checkCor(NoRN no){
-        NoRN filho = no;
+        NoRN seeing = no;
 
         //check se é raiz
-        if(isRoot(no)){
-            mudarCor(no, "preto");
+        if(isRoot(seeing)){
+            mudarCor(seeing, "preto");
             return;
         }
 
-        NoRN pai = no.getPai();
+        NoRN pai = seeing.getPai();
 
         //caso1 - check se o pai é preto
         if (pai == null || isBlack(pai)) {
@@ -154,6 +151,14 @@ public class ArvoreRN{
             tio = pai.getPai().getEsquerda();
         }
 
+        //pegando irmão de seeing
+        NoRN irmao;
+        if((int)seeing.getElemento()<(int)seeing.getPai().getElemento()){
+            irmao = seeing.getPai().getDireita();
+        } else{
+            irmao = seeing.getPai().getEsquerda();
+        }
+
         //caso 2
         if (tio != null && isRed(tio)) {
             mudarCor(pai, "preto");
@@ -164,32 +169,47 @@ public class ArvoreRN{
             return;
         }
 
-        //caso 3
-        if (pai == avo.getEsquerda()) {
-            // Pai é filho esquerdo do avô
-            if(filho == pai.getDireita()){
-                esquerdaSimples(pai);
-                filho = pai;
-                pai = filho.getPai();
-            }
-            //caso 3a
-            mudarCor(pai, "preto");
-        mudarCor(avo, "vermelho");
-        direitaSimples(avo);
+        //situação 3 remover e sucesor rubro
+        if(isBlack(seeing)){
 
-    } else {
-        //caso 3c
-        if (filho == pai.getEsquerda()) {
-            direitaSimples(pai);
-            filho = pai;
-            pai = filho.getPai();
+            //caso 1
+            if(isRed(irmao) && isBlack(seeing.getPai())){
+                caso1(seeing);
+                checkCor(seeing);
+            }
+
+            //caso 2a
+            else if(isBlack(irmao) && isBlack(seeing.getPai()) && isBlack(seeing.getEsquerda()) && isBlack(seeing.getDireita())){
+                caso2a(seeing); 
+                checkCor(seeing);
+            }
+
+            //caso 2b
+            else if(isBlack(irmao) && isRed(seeing.getPai()) && isBlack(seeing.getEsquerda()) && isBlack(seeing.getDireita())){
+                caso2b(seeing);
+                return;
+            }
+
+            //caso 3
+            else if(isBlack(irmao) && (seeing.getPai()!=null) && isRed(irmao.getEsquerda()) && isBlack(irmao.getDireita())){
+                caso3(seeing);
+                checkCor(seeing);
+            }
+
+            //caso 4
+            else if(isBlack(irmao) && (seeing.getPai()!=null) && (irmao.getEsquerda()!=null && isRed(irmao.getDireita()))){
+                caso4(seeing);
+                checkCor(seeing);
+                return;
+            }
         }
-        // Caso 3b: Filho é direita do pai → rotação esquerda no avô
-        mudarCor(pai, "preto");
-        mudarCor(avo, "vermelho");
-        esquerdaSimples(avo);
-    }
-        
+
+        //situação 4 remover e sucesor rubro
+        else if(isBlack(seeing)){
+            seeing.setCor("vermelho");
+            checkCor(seeing);
+            return;
+        }
     }
 
     //-------------------------------------------------------------------------------//
@@ -231,91 +251,322 @@ public class ArvoreRN{
     //----------------------------------|Remover|----------------------------------//
     //-----------------------------------------------------------------------------//
 
-    public void removeChild(int o){
-        NoRN seeing = locate(o);
+    public NoRN sucessoRN(NoRN o){
+        NoRN sucesor = o.getDireita(); // Achando o sucesor
+        while(sucesor.getEsquerda()!=null){ // Procurando um que não tem filho a esquerda
+            sucesor = sucesor.getEsquerda();
+        }
+        return sucesor;
+    }
+
+    public void removeHub(int o){
+        NoRN remover = locate(o);
+        NoRN sucesor = null;
+        NoRN irmao = null;
+
+        if(remover == null){
+            System.err.println("Elemento não encontrado!");
+            return;
+        }
+
+        if(remover.getEsquerda()!=null && remover.getDireita()!=null){
+            sucesor = sucessoRN(remover);
+        }
+
+        removeChild(remover, sucesor);
+
+        //pegando irmão do sucessor
+        if(isRoot(sucesor)){
+            return;
+        } else{
+            if((int)sucesor.getElemento()<(int)sucesor.getPai().getElemento()){
+                irmao = sucesor.getPai().getEsquerda();
+            } else{
+                irmao = sucesor.getPai().getDireita();
+            }
+        }
+        
+
+        //situação 2 remover e sucesor rubro
+        if(isBlack(remover) && isRed(sucesor)){
+            sucesor.setCor("preto");
+            return;
+        }
+
+        //situação 3 remover e sucesor rubro
+        if(isBlack(remover) && isBlack(sucesor)){
+
+            //caso 1
+            if(isRed(irmao) && isBlack(sucesor.getPai())){
+                caso1(sucesor);
+                checkCor(sucesor);
+                return;
+            }
+
+            //caso 2a
+            else if(isBlack(irmao) && isBlack(sucesor.getPai()) && isBlack(sucesor.getEsquerda()) && isBlack(sucesor.getDireita())){
+                caso2a(sucesor);
+                return;
+            }
+
+            //caso 2b
+            else if(isBlack(irmao) && isRed(sucesor.getPai()) && isBlack(sucesor.getEsquerda()) && isBlack(sucesor.getDireita())){
+                caso2b(sucesor);
+                return;
+            }
+
+            //caso 3
+            else if(isBlack(irmao) && (sucesor.getPai()!=null) && isRed(irmao.getEsquerda()) && isBlack(irmao.getDireita())){
+                caso3(sucesor);
+                return;
+            }
+
+            //caso 4
+            else if(isBlack(irmao) && (sucesor.getPai()!=null) && (irmao.getEsquerda()!=null && isRed(irmao.getDireita()))){
+                caso4(sucesor);
+                return;
+            }
+        }
+
+        //situação 4 remover e sucesor rubro
+        else if(isRed(remover) && isBlack(sucesor)){
+            sucesor.setCor("vermelho");
+            checkCor(sucesor);
+            return;
+        }
+
+    }
+
+
+    public void removeChild(NoRN r, NoRN s){
+        NoRN remover = r;
+        NoRN sucesor = s;
+        
 
         //caso no não tenha filhos
-        if(seeing.getEsquerda()==null && seeing.getDireita()==null){
-            if((int)seeing.getElemento() > (int)(seeing.getPai()).getElemento()){ //removendo filho a direita
-                (seeing.getPai()).setDireita(null);
-                seeing.setPai(null);
+        if(isBlack(remover) && remover.getEsquerda()==null && remover.getDireita()==null){
+            if(isRoot(remover)){ // removendo a raiz (árvore com 1 elemento)
+                raiz = null;
+                return;
             }
-            (seeing.getPai()).setEsquerda(null); //removendo filho a esquerda
-            checkCor(seeing.getPai());
-            seeing.setPai(null);
+
+            if((int)remover.getElemento() > (int)(remover.getPai()).getElemento()){ //removendo filho a direita
+                (remover.getPai()).setDireita(null);
+                remover.setPai(null);
+            }
+            else{
+                (remover.getPai()).setEsquerda(null); //removendo filho a esquerda
+                remover.setPai(null);
+            }
+            checkCor(remover.getPai());
+            remover.setPai(null);
+
+            return;
+        }
+
+        else if(isRed(remover) && remover.getEsquerda()==null && remover.getDireita()==null){
+            if((int)remover.getElemento() > (int)(remover.getPai()).getElemento()){ //removendo filho a direita
+                (remover.getPai()).setDireita(null);
+                remover.setPai(null);
+            }
+            else{
+                (remover.getPai()).setEsquerda(null); //removendo filho a esquerda
+                checkCor(remover.getPai());
+                remover.setPai(null);
+            }
             return;
         }
 
 
         //caso tenha apenas um filho
-        else if(seeing.getEsquerda()!=null && seeing.getDireita()==null){ // Filho a esquerda
-            if((int)seeing.getElemento() > (int)(seeing.getPai()).getElemento()){ // Checando se o filho é maior que o pai
-                if(this.isBlack(seeing) && this.isRed(seeing.getEsquerda())){ //check se o seeing é preto e o filho é vermelho
-                    (seeing.getEsquerda()).setCor("vermelho");
-                    
-                }
-                seeing.getPai().setDireita(seeing.getEsquerda()); // Se filho maior, passa o filho para a direita do pai
-
-            } else {
-                if(this.isBlack(seeing) && this.isRed(seeing.getEsquerda())){ //check se o seeing é preto e o filho é vermelho
-                    (seeing.getEsquerda()).setCor("vermelho");
-                    
-                }
-                seeing.getPai().setEsquerda(seeing.getEsquerda()); // Se não, passa o filho para a esquerda do pai
-            }
-
-            checkCor(seeing.getPai());
-            seeing.setEsquerda(null);
-            seeing.setPai(null);
-            return;
-        }
-
-        else if(seeing.getEsquerda()==null && seeing.getDireita()!=null){ // filho a direita
-            if((int)seeing.getElemento()>(int)seeing.getPai().getElemento()){ // Checando se o filho é maior que o pai
-                (seeing.getPai()).setDireita(seeing.getDireita()); // Se sim, passa o filho para a direita do pai
-            } else {
-                (seeing.getPai()).setEsquerda(seeing.getDireita()); // Se não, passa o filho para a esquerda do pai
-            }
-
-            checkCor(seeing.getPai());
-            seeing.setDireita(null);
-            seeing.setPai(null);
-            return;
-        }
-
-
-        //caso tenha os dois filhos
-        else{
-            NoRN sucesor = seeing.getDireita(); // Achando o sucesor
-            while(sucesor.getEsquerda()!=null){ // Procurando um que não tem filho a esquerda
-                sucesor = sucesor.getEsquerda();
-            }
-            sucesor.setEsquerda(seeing.getEsquerda()); // Passando o filho a esquerda do seeing para o sucesor
-            if(sucesor.getPai() != seeing){ // Checando se o sucesor é filho direto do seeing
-                sucesor.getPai().setEsquerda(sucesor.getDireita()); // Se não, passa o filho a direita do sucesor para a esquerda do pai do sucesor
-                
-                if(sucesor.getDireita() != null){
-                    (sucesor.getDireita()).setPai(sucesor.getPai()); // Passando o pai do sucesor para o filho
-                }
-
-                sucesor.setDireita(seeing.getDireita()); // Passando o filho a direita do seeing para o sucesor
-                (sucesor.getDireita()).setPai(sucesor);
-            }
-
-            if((int)seeing.getElemento()>(int)seeing.getPai().getElemento()){ // Checando se o seeing é filho a direita do pai
-                seeing.getPai().setDireita(sucesor); // Se sim, passa o sucesor para a direita do pai do seeing
+        // tem um filho a esquerda
+        else if(remover.getEsquerda()!=null && remover.getDireita()==null){
+            if((int)remover.getElemento() > (int)(remover.getPai()).getElemento()){ // check se o remover é maior que o pai
+                remover.getPai().setDireita(remover.getEsquerda()); //passa o filho para a direita do pai
             }
             else{
-                seeing.getPai().setEsquerda(sucesor); // Se não, passa o sucesor para a esquerda do pai do seeing
+                remover.getPai().setEsquerda(remover.getEsquerda()); //passa o filho para a esquerda do pai
             }
 
-            sucesor.setPai(seeing.getPai()); // Passando o pai do seeing para o sucesor
-            seeing.setEsquerda(null);
-            seeing.setDireita(null);
-            seeing.setPai(null);
-            checkCor(sucesor);
+            remover.setEsquerda(null);
+            checkCor(remover.getPai());
+            remover.setPai(null);
             return;
         }
+
+        // tem um filho a direita
+        else if(remover.getEsquerda()==null && remover.getDireita()!=null){
+            if((int)remover.getElemento() > (int)(remover.getPai()).getElemento()){ // check se o remover é maior que o pai
+                remover.getPai().setDireita(remover.getDireita()); //passa o filho para a direita do pai
+            }
+            else{
+                remover.getPai().setEsquerda(remover.getDireita()); //passa o filho para a esquerda do pai
+            }
+
+            remover.setDireita(null);
+            checkCor(remover.getPai());
+            remover.setPai(null);
+            return;
+        }
+
+
+        //caso tenha os dois filhos //TEM QUE CONCERTA AINDA AAAAAAAAAAAAAAAAAAAAAAAAAAA
+        else{
+            //passando o sucesor para o lugar do remover
+            if(remover.getPai()!=null){
+                if((int)remover.getPai().getElemento() > (int)remover.getElemento()){ //pai é maior que o remover
+                    remover.getPai().setEsquerda(sucesor);
+
+                }else{
+                    remover.getPai().setDireita(sucesor); //pai é menor que o remover
+                }
+
+                sucesor.getPai().setEsquerda(sucesor.getDireita()); // Passando o filho direito do sucesor para a esquerda do seu pai
+                sucesor.setEsquerda(remover.getEsquerda()); // Passando a esquerda do remover para o sucesor
+                if (remover.getEsquerda() != null) {
+                    remover.getEsquerda().setPai(sucesor); // Passando o pai do remover para a esquerda do sucessor
+                }
+
+                sucesor.setPai(remover.getPai()); // Passando o pai do remover para o sucessor
+                sucesor.setDireita(remover.getDireita()); // Passando a direita do remover para o sucessor
+                if (remover.getDireita() != null) {
+                    remover.getDireita().setPai(sucesor);
+                }
+
+                remover.setEsquerda(null);
+                remover.setDireita(null);
+                remover.setPai(null);
+                checkCor(sucesor);
+            } else {
+                // remover é raiz
+                raiz = sucesor;
+                sucesor.getPai().setEsquerda(sucesor.getDireita());
+                if (sucesor.getDireita() != null) {
+                    sucesor.getDireita().setPai(sucesor.getPai());
+                }
+                sucesor.setEsquerda(remover.getEsquerda());
+                if (remover.getEsquerda() != null) {
+                    remover.getEsquerda().setPai(sucesor);
+                }
+                sucesor.setDireita(remover.getDireita());
+                if (remover.getDireita() != null) {
+                    remover.getDireita().setPai(sucesor);
+                }
+                sucesor.setPai(null);
+                remover.setEsquerda(null);
+                remover.setDireita(null);
+                remover.setPai(null);
+                checkCor(sucesor);
+            }
+            return;
+        }
+    }
+
+
+
+    //isBlack(remover) && isRed(sucesor) && isBlack(irmao) && isBlack(sucesor.getPai())
+
+    public void caso1(NoRN sucesor){
+        sucesor.setDuploNegro(true); //sucesor é duplo negro
+
+        esquerdaSimples(sucesor); //rotação simples
+
+        //pegando novo irmão do sucesor
+        NoRN irmao = null;
+        if((int)sucesor.getElemento()<(int)sucesor.getPai().getElemento()){
+            irmao = sucesor.getPai().getEsquerda();
+        } else{
+            irmao = sucesor.getPai().getDireita();
+        }
+
+        irmao.setCor("preto"); //mudando a cor 
+
+        sucesor.getPai().setCor("preto"); //mudando a cor
+
+        checkCor(sucesor);
+    }
+
+    //isBlack(remover) && isBlack(sucesor) && isBlack(irmao) && isBlack(sucesor.getPai() && (sucesor.getDireita() == null || isBlack(sucesor.getDireita()) && (sucesor.getEsquerda() == null || isBlack(sucesor.getEsquerda()))
+
+    public void caso2a(NoRN sucesor){
+        //pegando novo irmão do sucesor
+        NoRN irmao = null;
+
+        if((int)sucesor.getElemento()<(int)sucesor.getPai().getElemento()){
+            irmao = sucesor.getPai().getEsquerda();
+        } else{
+            irmao = sucesor.getPai().getDireita();
+        }
+
+        irmao.setCor("vermelho"); //mudando a cor
+
+        //pasando o duplo negro pro pai
+        sucesor.setDuploNegro(false);
+        sucesor.getPai().setDuploNegro(true);
+
+        checkCor(sucesor);
+    }
+
+    //isBlack(remover) && isBlack(sucesor) && isBlack(irmao) && isRed(sucesor.getPai() && (sucesor.getDireita() == null || isBlack(sucesor.getDireita()) && (sucesor.getEsquerda() == null || isBlack(sucesor.getEsquerda()))
+    
+    public void caso2b(NoRN sucesor){
+        //pegando novo irmão do sucesor
+        NoRN irmao = null;
+
+        if((int)sucesor.getElemento()<(int)sucesor.getPai().getElemento()){
+            irmao = sucesor.getPai().getEsquerda();
+        } else{
+            irmao = sucesor.getPai().getDireita();
+        }
+
+        irmao.setCor("vermelho"); //mudando a cor
+
+        sucesor.getPai().setCor("preto"); //mudando a cor
+
+        //duplo negro é absorvido
+        sucesor.setDuploNegro(false);
+    }
+
+    //isBlack(remover) && isBlack(sucesor) && isBlack(irmao) && isBlack(sucesor.getDireita() && isRed(sucesor.getEsquerda())
+
+    public void caso3(NoRN sucesor){
+        //pegando novo irmão do sucesor
+        NoRN irmao = null;
+        if((int)sucesor.getElemento()<(int)sucesor.getPai().getElemento()){
+            irmao = sucesor.getPai().getEsquerda();
+        } else{
+            irmao = sucesor.getPai().getDireita();
+        }
+
+        direitaSimples(irmao);
+
+        //pasando cor do filho esquerdo para irmao e a cor de irmao para filho esquerdo
+        irmao.setCor(irmao.getEsquerda().getCor());
+        irmao.getEsquerda().setCor("preto");
+
+        checkCor(sucesor);
+    }
+
+    //isBlack(remover) && isBlack(sucesor) && isBlack(irmao) && isBlack(sucesor.getDireita() && isRed(sucesor.getEsquerda())
+
+    public void caso4(NoRN sucesor){
+        esquerdaSimples(sucesor);
+        NoRN irmao = null;
+
+        //pegando novo irmão do sucesor
+        if((int)sucesor.getElemento()>(int)sucesor.getPai().getElemento()){
+            irmao = sucesor.getPai().getEsquerda();
+        } else{
+            irmao = sucesor.getPai().getDireita();
+        }
+
+        irmao.setCor(sucesor.getPai().getCor());
+        sucesor.getPai().setCor("preto");
+
+        irmao.getDireita().setCor("preto");
+
+        //duplo negro é absorvido
+        sucesor.setDuploNegro(false);
     }
 
     //------------------------------------------------------------------------------//

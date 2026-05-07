@@ -80,6 +80,7 @@ public class ArvoreAVL{
                     esquerda++;
                     break;
                 }
+                
             } else {
                 pai.setFB((int)pai.getFB()-1); // adiciona -1 no FB do pai
                 if((int)pai.getFB()==0){ // Checando se o pai ficou balanceado
@@ -195,6 +196,7 @@ public class ArvoreAVL{
         NoAVL novo = new NoAVL(o);
         NoAVL seeing = raiz;
         int foi = 0; // Marcado para confirma que foi colocado
+
         while(foi!=1){
             if((int)seeing.getElemento()>o){ // Checando se o elemento do no atual é maior que o novo
                 if(seeing.getEsquerda()==null){ //Se sim e o no a esquerda é fazio, coloca o no novo aqui
@@ -205,6 +207,7 @@ public class ArvoreAVL{
                 }
                 seeing=seeing.getEsquerda(); // Move o no atual par a esquerda
             }
+
             else if((int)seeing.getElemento()<o){  // Checando se o elemento do no atual é menor que o novo
                 if(seeing.getDireita()==null){ //Se sim e o no a direita é fazio, coloca o no novo aqui
                     novo.setPai(seeing);
@@ -214,6 +217,7 @@ public class ArvoreAVL{
                 }
                 seeing=seeing.getDireita();  // Move o no atual par a direita
             }
+
             else if((int)seeing.getElemento()==o){ // Checando se o elemento do no atual é igual ao novo
                 System.err.println("Indece já existe!");
                 foi++;
@@ -278,7 +282,9 @@ public class ArvoreAVL{
             while(sucesor.getEsquerda()!=null){ // Procurando um que não tem filho a esquerda
                 sucesor = sucesor.getEsquerda();
             }
+            
             sucesor.setEsquerda(seeing.getEsquerda()); // Passando o filho a esquerda do seeing para o sucesor
+
             if(sucesor.getPai() != seeing){ // Checando se o sucesor é filho direto do seeing
                 sucesor.getPai().setEsquerda(sucesor.getDireita()); // Se não, passa o filho a direita do sucesor para a esquerda do pai do sucesor
                 

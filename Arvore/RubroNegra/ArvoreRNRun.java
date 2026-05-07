@@ -44,7 +44,8 @@ private static ArvoreRN arvore;
         imprimirArvore(arvore.root());
         System.out.println("----------------------------------------");
 
-        arvore.removeChild(20);
+        //quebra aqui
+        arvore.removeHub(20);
         System.out.println("Arvore 1:");
         imprimirArvore(arvore.root());
         System.out.println("----------------------------------------");
