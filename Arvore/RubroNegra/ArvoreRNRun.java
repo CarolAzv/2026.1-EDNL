@@ -44,7 +44,6 @@ private static ArvoreRN arvore;
         imprimirArvore(arvore.root());
         System.out.println("----------------------------------------");
 
-        //quebra aqui
         arvore.removeHub(20);
         System.out.println("Arvore 1:");
         imprimirArvore(arvore.root());
@@ -62,11 +61,10 @@ private static ArvoreRN arvore;
         System.out.println("----------------------------------------");
 
         arvore2.addChild(5);
-        arvore2.addChild(15);
         System.out.println("Arvore 2:");
         imprimirArvore(arvore2.root());
         System.out.println("----------------------------------------");
-
+/*
         arvore2.addChild(3);
         arvore2.addChild(7);
         arvore2.addChild(12);
@@ -84,7 +82,7 @@ private static ArvoreRN arvore;
         System.out.println("Arvore 2:");
         imprimirArvore(arvore2.root());
         System.out.println("----------------------------------------");
-
+*/
 
     }
 
