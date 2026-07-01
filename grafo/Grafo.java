@@ -1,5 +1,3 @@
-import java.util.ArrayList;
-
 public class Grafo{
     private boolean[][] Matrix;
     private int Vertice;
@@ -10,19 +8,43 @@ public class Grafo{
     }
 
 
-    public ArrayList arestasIncidentes(ver){}
+    public boolean[][] getMatrix(){
+        return Matrix;
+    }
 
-    public ArrayList vertices(){}
+    public int getVertice(){
+        return Vertice;
+    }
 
-    public ArrayList arestas(){}
+    public Object[] arestasIncidentes(int ver){
+        Object[] incidentes = new Object[Matrix.length];
 
-    public ArrayList finalVertices(int are){}
+        for(int i = 0; i < Matrix.length; i++){
+            incidentes[i] = Matrix[i][ver];
+        }
 
-    public aaaaaaaaa oposto(int ver, int are){}
+        return incidentes;
+    }
 
-    public boolean éAdjacente(int ver, w){}
+    //public Object[] vertices(){}
 
-    public boolean eDirecionado(e){}
+    //public Object[] arestas(){}
+
+    //public Object[] finalVertices(int are){}
+
+    public boolean éAdjacente(int ver1, int ver2){
+        if(Matrix [ver1][ver2] == true){
+            return true;
+        }
+        return false;
+    }
+
+    public boolean eDirecionado(int ver1, int ver2){
+        if(Matrix [ver1][ver2] == true && Matrix [ver2][ver1] == false){
+            return true;
+        }
+        return false;
+    }
 
  
 //------------------------------------------------------------------------------------//
@@ -30,16 +52,15 @@ public class Grafo{
 
     public void inserirVertice(int num){
         Vertice = Vertice + num;
-        boolean[][] novaMatriz = new int[Vertice][Vertice];
+        boolean[][] novaMatriz = new boolean[Vertice][Vertice];
 
-        for (int i = 0; i < Matrix.length; i++) {
-            for (int j = 0; j < Matrix[i].length; j++) {
+        for(int i = 0; i < Matrix.length; i++) {
+            for(int j = 0; j < Matrix[i].length; j++) {
                 novaMatriz[i][j] = Matrix[i][j];
             }
         }
 
         Matrix = novaMatriz;
-        novaMatriz.clear();
     }
 
     public void inserirAresta(int ver1, int ver2){
@@ -61,8 +82,8 @@ public class Grafo{
 
         for(int i=0; i<Vertice-1; i++){
             for(int j=ver; j<Vertice-1; j++){
-                Matrix[i][j] = Matrix[i+1][j];
-            }
+                Matrix[i][j] = Matrix[i][j+1];
+            } 
         }
 
         Vertice--;
