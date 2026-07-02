@@ -68,9 +68,9 @@ public class GrafoRun{
         boolean[][] matrix = grafo.getMatrix();
         int totalVertices = grafo.getVertice();
 
-        for(int i = 0; i < totalVertices; i++){
-            for(int j = 0; j < totalVertices; j++){
-                System.out.print(matrix[i][j] + " ");
+        for(int i=0; i<totalVertices; i++){
+            for(int j=0; j<totalVertices; j++){
+                System.out.print(matrix[i][j] ? "1 ": "0 ");
             }
             System.out.println();
         }
